@@ -2,11 +2,12 @@
 
 Author: z@apiary.io
 Version: 1A7
+Subversion: Base
 
 ---
 
 # API Blueprint
-#### Format 1A revision 7
+#### Format 1A revision 7 with extensions used by Base
 
 ## [I. API Blueprint Language](#def-api-blueprint-language)
 1. [Introduction](#def-introduction)
@@ -33,9 +34,14 @@ Version: 1A7
 10. [Resource section](#def-resource-section)
 11. [Resource model section](#def-model-section)
 12. [URI parameters section](#def-uriparameters-section)
-13. [Action section](#def-action-section)
-14. [Request section](#def-request-section)
-15. [Response section](#def-response-section)
+13. [Attributes section](#def-attributes-section)
+14. [Action section](#def-action-section)
+15. [Request section](#def-request-section)
+16. [Response section](#def-response-section)
+17. [Data Structures section](#def-data-structures-section)
+18. [Data Structure section](#def-data-structure-section)
+19. [Members section](#def-members-section)
+20. [Sample section](#def-sample-section)
 
 ## [III. Appendix](#def-appendix)
 1. [URI Templates](#def-uri-templates)
@@ -71,22 +77,31 @@ All of the blueprint sections are optional. However, when present, a section **m
 + [`0-1` **API Name & overview** section](#def-api-name-section)
 + [`0+` **Resource** sections](#def-resource-section)
     + [`0-1` **URI Parameters** section](#def-uriparameters-section)
+    + [`0-1` **Attributes** section](#def-attributes-section)
     + [`0-1` **Model** section](#def-model-section)
         + [`0-1` **Headers** section](#def-headers-section)
         + [`0-1` **Body** section](#def-body-section)
         + [`0-1` **Schema** section](#def-schema-section)    
     + [`1+` **Action** sections](#def-action-section)
         + [`0-1` **URI Parameters** section](#def-uriparameters-section)
+        + [`0-1` **Attributes** section](#def-attributes-section)
         + [`0+` **Request** sections](#def-request-section)
             + [`0-1` **Headers** section](#def-headers-section)
+            + [`0-1` **URI Parameters** section](#def-uriparameters-section)
+            + [`0-1` **Attributes** section](#def-attributes-section)
             + [`0-1` **Body** section](#def-body-section)
             + [`0-1` **Schema** section](#def-schema-section)
         + [`1+` **Response** sections](#def-response-section)
             + [`0-1` **Headers** section](#def-headers-section)
+            + [`0-1` **Attributes** section](#def-attributes-section)
             + [`0-1` **Body** section](#def-body-section)
             + [`0-1` **Schema** section](#def-schema-section)
 + [`0+` **Resource Group** sections](#def-resourcegroup-section)
     + [`0+` **Resource** sections](#def-resource-section) (see above)
++ [`0-1` **Data Structures** section](#def-data-structures-section)
+    + [`0+` **Data Structure** sections](#def-data-structure-section)
+        + [`0-1` **Members** section](#def-members-section)
+        + [`0-1` **Sample** section](#def-sample-section)
 
 > **NOTE:** The number prior to a section name denotes the allowed number of the section occurrences.
 
@@ -196,6 +211,10 @@ Following reserved keywords are used in section definitions:
 - `Header` & `Headers`
 - `Parameter` & `Parameters`
 - `Values`
+- `Attributes`
+- `Members`
+- `Sample`
+- `Data Structures` & `Structure`
 
 > **NOTE: Avoid using these keywords in other Markdown headers or lists**
 
@@ -339,7 +358,7 @@ Asset section is the base section for atomic data in API Blueprint. The content 
 ## 3. Payload section
 - **Abstract**
 - **Parent sections:** vary, see descendants
-- **Nested sections:** [`0-1` Headers section](#def-headers-section), [`0-1` Body section](#def-body-section), [`0-1` Schema section](#def-schema-section)
+- **Nested sections:** [`0-1` Headers section](#def-headers-section), [`0-1` URI Parameters section](#def-uriparameters-section), [`0-1` Attributes section](#def-attributes-section), [`0-1` Body section](#def-body-section), [`0-1` Schema section](#def-schema-section)
 - **Markdown entity:** list
 - **Inherits from**: [Named section](#def-named-section)
 
@@ -353,13 +372,15 @@ Defined by a [keyword](#def-keywords) in Markdown list entity. The keyword **may
 #### Description
 Payload sections represent the information transferred as a payload of an HTTP request or response messages. A Payload consists of optional meta information in the form of HTTP headers and optional content in the form HTTP body. 
 
-Furthermore, in API Blueprint context, a payload include a description and a validation schema.
+Furthermore, in API Blueprint context, a payload include a description, a description of URI parameters, a description of its message body attributes and a validation schema.
 
 A payload section **may** have its media type associated. A payload's media type represents the metadata received or sent in the form of a HTTP `Content-Type` header. When specified a payload **should** include nested [Body section](#def-body-section).
 
 This section **should** include at least one following nested sections:
  
 - [`0-1` Headers section](#def-headers-section)
+- [`0-1` URI Parameters section](#def-uriparameters-section)
+- [`0-1` Attributes section](#def-attributes-section)
 - [`0-1` Body section](#def-body-section)
 - [`0-1` Schema section](#def-schema-section)
 
@@ -543,7 +564,7 @@ This sections represents a group of resources (Resource Sections). **May** inclu
 <a name="def-resource-section"></a>
 ## 10. Resource section
 - **Parent sections:** none, [Resource group section](#def-resourcegroup-section)
-- **Nested sections:** [`0-1` Parameters section](#def-uriparameters-section), [`0-1` Model section](#def-model-section), [`1+` Action section](#def-action-section)
+- **Nested sections:** [`0-1` URI Parameters section](#def-uriparameters-section), [`0-1` Attributes section](#def-attributes-section), [`0-1` Model section](#def-model-section), [`1+` Action section](#def-action-section)
 - **Markdown entity:** header
 - **Inherits from**: [Named section](#def-named-section)
 
@@ -573,6 +594,7 @@ This section **should** include at least one nested [Action section](#def-action
  
 - [`0-1` Model section](#def-model-section)
 - [`0-1` URI parameters section](#def-uriparameters-section)
+- [`0-1` Attributes section](#def-attributes-section)
 
     URI parameters discussed in the scope of a Resource section apply to _any and all_ nested Action sections.
 
@@ -647,7 +669,7 @@ Discussion of URI parameters in the _scope of the parent section_.
 
 This section **must** be composed of nested list items only. This section **must not** contain any other elements. One list item per URI parameter. The nested list items subsections inherit from the [Named section](#def-named-section) and are subject to additional formatting as follows:
 
-    + <parameter name> = `<default value>` (required | optional , <type>, `<example value>`) ... <description>
+    + <parameter name> = `<default value>` (required | optional | readonly | writeonly, <type>, `<example value>`) ... <description>
 
         <additional description>
         
@@ -669,6 +691,8 @@ Where:
 *  and `<enumeration element n>` represents an element of enumeration type.
 * `required` is the **optional** specifier of a required parameter (this is the **default**)
 * `optional` is the **optional** specifier of an optional parameter.
+* `readonly` is the **optional** specifier of a read-only parameter.
+* `writeonly` is the **optional** specifier of a write-only parameter.
 
 > **NOTE:** This section **should only** contain parameters that are specified in the parents' URI template, and does not have to list every URI parameter. 
 
@@ -711,10 +735,36 @@ Where:
 ```
 ---
 
+13. [Attributes section](#def-attributes-section)
+
+<a name="def-attributes-section"></a>
+## 13. Attributes section
+- **Parent sections:** [Action section](#def-action-section), [Resource Section](#def-resource-section), [Payload section](#def-payload-section)
+- **Nested sections:** [Refer to URI parameters section](#def-uriparameters-section)
+- **Markdown entity:** list
+- **Inherits from**: [URI parameters](#def-uriparameters-section)
+
+#### Definition
+Defined by the `Attributes` keyword written in a Markdown list item:
+
+    + Attributes
+
+#### Description
+This section **must** be composed of nested list items only in the form described in the [URI parameters section](#def-uriparameters-section).
+
+#### Example
+
+```
++ Attributes
+    + id ... Id of a post.
+```
+
+---
+
 <a name="def-action-section"></a>
-## 13. Action section
+## 14. Action section
 - **Parent sections:** [Resource section](#def-resource-section)
-- **Nested sections:** [`0-1` URI parameters section](#def-uriparameters-section), [`0+` Request section](#def-request-section), [`1+` Response section](#def-response-section)
+- **Nested sections:** [`0-1` URI Parameters section](#def-uriparameters-section), [`0-1` Attributes section](#def-attributes-section), [`0+` Request section](#def-request-section), [`1+` Response section](#def-response-section)
 - **Markdown entity:** header
 - **Inherits from**: [Named section](#def-named-section)
 
@@ -733,6 +783,8 @@ Defined by an action [name (identifier)](#def-identifier) followed by an [HTTP r
 Definition of at least one complete HTTP transaction as performed with the parent resource section. An action section **may** consists of multiple HTTP transaction examples for the given HTTP request method.
 
 This section **may** include one nested [URI parameters section](#def-uriparameters-section) describing any URI parameters _specific_ to the action – URI parameters discussed in the scope of an Action section apply to the respective Action section ONLY.
+
+This section **may** include one nested [Attributes section](#def-attributes-section) - attributes discussed in the scope of an Action section apply to the respective Action section ONLY.
 
 It **should** include at least one nested [Response section](#def-response-section) and **may** include additional nested [Request](#def-request-section) and [Response](#def-response-section) sections.
 
@@ -810,7 +862,7 @@ Multiple Request and Response nested sections within one transaction example **s
 ---
 
 <a name="def-request-section"></a>
-## 14. Request section
+## 15. Request section
 - **Parent sections:** [Action section](#def-action-section)
 - **Nested sections:** [Refer to payload section](#def-payload-section)
 - **Markdown entity:** list
@@ -833,7 +885,7 @@ One HTTP request-message example – payload.
 ---
 
 <a name="def-response-section"></a>
-## 15. Response section
+## 16. Response section
 - **Abstract**
 - **Parent sections:** [Action section](#def-action-section)
 - **Nested sections:** [Refer to payload section](#def-payload-section)
@@ -853,6 +905,154 @@ One HTTP response-message example – payload.
     + Response 201 (application/json)
         
                 { "message" : "created" }
+
+---
+
+<a name="def-data-structures-section"></a>
+## 17. Data Structures section
+- **Parent sections:** none
+- **Nested sections:** [`0+` Data structure sections](#def-data-structure-section)
+- **Markdown entity:** header
+- **Inherits from**: none
+
+#### Definition
+Defined by the `Data Structures` keyword:
+
+    # Data Structures
+
+#### Description
+This sections holds arbitrary data structures definitions. **May** include a description and one or more nested [Data Structure sections](#def-data-structure-section).
+
+
+#### Example
+
+    # Data Structures
+    Data structures used in the Blog API.
+
+    ## Structure Post
+
+    + Members
+        + id (number) ... Unique identifier of the post.
+        + header (string) ... Header of the post.
+        + content (string) ... Content of the post.
+        + published = `true` (boolean) ... Whether blog post should be published or not.
+
+    + Sample 
+
+            {
+                "id": 1,
+                "published": true,
+                "header": "Blog post header",
+                "content": "Blog post content"
+            }
+
+    ## Structure Comment
+
+    + Members
+        + id (number) ... Unique identifier of the comment.
+        + author_id (number) ... Unique identifier of the author of the comment.
+        + post_id (number) ... Unique identifier of the blog post.
+        + content (string) ... Content of the comment.
+
+    + Sample
+
+            {
+                "id": 1,
+                "author_id": 1,
+                "post_id": 1,
+                "content": "Some comment content"
+            }
+
+---
+
+<a name="def-data-structure-section"></a>
+## 18. Data Structure section
+- **Parent sections:** [Data Structures section](#def-data-structure-section)
+- **Nested sections:** [`0-1` Members section](#def-members-section), [`0-1` Sample section](#def-sample-section)
+- **Markdown entity:** header
+- **Inherits from**: [Named section](#def-named-section)
+
+#### Definition
+Defined by the `Structure` keyword followed by structure [name (identifier)](#def-identifier):
+
+    # Structure <identifier>
+
+#### Description
+This section **may** include a data structure description at most **one** of following nested sections:
+ 
+- [`0-1` Members](#def-members-section)
+- [`0-1` Sample section](#def-sample-section)
+
+#### Example
+
+    # Structure Post
+
+    + Members
+        + id (number) ... Unique identifier of the post.
+        + header (string) ... Header of the post.
+        + content (string) ... Content of the post.
+        + published = `true` (boolean) ... Whether blog post should be published or not.
+
+    + Sample 
+
+            {
+                "id": 1,
+                "published": true,
+                "header": "Blog post header",
+                "content": "Blog post content"
+            }
+
+---
+
+<a name="def-members-section"></a>
+## 19. Members section
+- **Parent sections:** [Data Structure section](#def-data-structure-section)
+- **Nested sections:** [Refer to URI parameters section](#def-uriparameters-section)
+- **Markdown entity:** list
+- **Inherits from**: [URI parameters](#def-uriparameters-section)
+
+#### Definition
+Defined by the `Members` keyword written in a Markdown list item:
+
+    + Attributes
+
+#### Description
+This section **must** be composed of nested list items only in the form described in the [URI parameters section](#def-uriparameters-section).
+
+#### Example
+
+```
++ Members
+    + id (number) ... Unique identifier of the post.
+```
+
+---
+
+<a name="def-sample-section"></a>
+## 20. Sample section
+- **Parent sections:** [Data Structure section](#def-data-structure-section)
+- **Nested sections:** [Refer to payload section](#def-payload-section)
+- **Markdown entity:** list
+- **Inherits from**: [Payload section](#def-payload-section)
+
+#### Definition
+Defined by the `Sample` keyword followed by an optional [identifier](#def-identifier):
+
+    + Sample <identifier> (<Media Type>)
+
+#### Description
+One HTTP message example – payload.
+
+#### Example
+
+    + Sample Blog Post (application/json)
+        
+            {
+                "id": 1,
+                "published": true,
+                "header": "Blog post header",
+                "content": "Blog post content"
+            }
 
 ---
 
